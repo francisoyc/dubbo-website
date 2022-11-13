@@ -3,14 +3,18 @@ title: "IDL管理工具——BUF"
 linkTitle: "IDL管理工具——BUF"
 date: 2022-11-12
 description: >-
-     Page description for heading and indexes.
+     与简单的 REST/JSON 服务相比，使用 IDL 定义 API 提供了许多好处，如今，Protobuf 是业内最稳定、被广泛采用的 IDL。但就目前情况而言，使用 Protobuf 比使用 JSON 作为数据传输格式要困难得多。BUF是使用 Protobuf 的一种新方式，本文将介绍BUF的优势以及如何使用
 ---
 
-## Heading
+## 背景
+使用Protobuf会在整个API生命周期中面临许多挑战，这也正是Buf想要解决的问题：
 
-Edit this template to create your new page.
+* **API 设计不一致：** 编写可维护的、一致的 Protobuf API 不像编写可维护的基于 REST/JSON 的 API 那样被广泛理解。如果不执行标准，组织的 Protobuf API 可能会出现不一致，并且设计决策可能会无意中影响 API 未来的可迭代性。
+* **没有依赖管理的思想：** Protobuf 文件是从 GitHub 复制的可能包含错误内容的文件。在Buf Schema Registry (BSR)之前，没有尝试过统一的跟踪和管理跨文件依赖关系。这就像在没有 npm 的情况下编写 JavaScript，在没有cargo的情况下编写 Rust，在没有modules的情况下编写 Go，以及我们都已经习惯的所有其他编程语言依赖管理器。
+* **没有强制向前和向后兼容：** 虽然向前和向后兼容是 Protobuf 的承诺，但实际上维护向后兼容的 Protobuf API 并没有得到广泛的实践，而且很难实施。
+* **存根分发是一个困难的、未解决的过程：** 组织必须选择集中他们的 protoc 工作流并分发生成的代码，或者要求所有服务客户端独立运行 protoc。因为以可靠的方式使用 protoc（和相关的 protoc 插件）有一个负责的学习过程，所以组织经常难以分发他们的 Protobuf 文件和存根。这样会产生大量开销，并且通常需要专门的团队来管理流程。即使使用像 Bazel 这样的构建系统，将 API 暴露给外部客户仍然存在问题。
+* **生态工具不完善：** 现在已有许多用于 REST/JSON API 的用户体验友好的工具，但是对于 Protobuf API 来说并没有被广泛标准化或用户友好的模拟服务器生成、模糊测试、文档的工具。因此，团队需要定期造轮子并构建自定义工具来复制 JSON 生态。
 
-* Give it a good name, ending in `.md` - e.g. `getting-started.md`
-* Edit the "front matter" section at the top of the page (weight controls how its ordered amongst other pages in the same directory; lowest number first).
-* Add a good commit message at the bottom of the page (<80 characters; use the extended description field for more detail).
-* Create a new branch so you can preview your new file and request a review via Pull Request.
+Buf工具解决了上述许多问题，最终允许您将大部分时间和精力从管理 Protobuf 文件转移到实现核心功能和基础设施上来。
+
+

@@ -32,5 +32,64 @@ Buf 解决了上述许多问题，Buf 可帮助您的团队在整个生命周期
 
 
 ## 快速开始
+### 安装buf CLI
+macOS or Linux用户可以使用 [Brew](https://brew.sh/) 安装
+```
+$ brew install bufbuild/buf/buf
+```
 
+Windows用户可以使用 [Scoop](https://scoop.sh/) 安装，或者从 [Github](https://github.com/bufbuild/buf/releases/latest) 下载exe
+```
+scoop install buf
+```
+更多方式请参考[官网](https://docs.buf.build/installation)
 
+### 下载Demo
+需要先安装 [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+```
+$ git clone https://github.com/bufbuild/buf-tour
+```
+Demo中包含一个start和finish目录，start是初始状态，finish是通过buf命令行操作后的终态，结构如下：
+```
+buf-tour/
+├── finish
+│   ├── buf.gen.yaml
+│   ├── buf.work.yaml
+│   ├── client
+│   │   └── main.go
+│   ├── gen
+│   │   └── proto
+│   │       └── go
+│   │           ├── payment
+│   │           │   └── v1alpha1
+│   │           │       └── payment.pb.go
+│   │           └── pet
+│   │               └── v1
+│   │                   ├── pet.pb.go
+│   │                   └── pet_grpc.pb.go
+│   ├── go.mod
+│   ├── go.sum
+│   ├── paymentapis
+│   │   ├── buf.lock
+│   │   ├── buf.yaml
+│   │   └── payment
+│   │       └── v1alpha1
+│   │           └── payment.proto
+│   ├── petapis
+│   │   ├── buf.lock
+│   │   ├── buf.md
+│   │   ├── buf.yaml
+│   │   └── pet
+│   │       └── v1
+│   │           └── pet.proto
+│   └── server
+│       └── main.go
+└── start
+    └── petapis
+        ├── google
+        │   └── type
+        │       └── datetime.proto
+        └── pet
+            └── v1
+                └── pet.proto
+```

@@ -3,93 +3,31 @@ title: "IDL管理工具——Buf"
 linkTitle: "IDL管理工具——Buf"
 date: 2022-11-12
 description: >-
-     与简单的 REST/JSON 服务相比，使用 IDL 定义 API 提供了许多好处，如今，Protobuf 是业内最稳定、被广泛采用的 IDL。但就目前情况而言，使用 Protobuf 比使用 JSON 作为数据传输格式要困难得多。Buf是使用 Protobuf 的一种新方式，本文将对Buf重点介绍。
+     与简单的 REST/JSON 服务相比，使用 IDL 定义 API 提供了许多好处，如今，Protobuf 是业内最稳定、被广泛采用的 IDL。但就目前情况而言，使用 Protobuf 比使用 JSON 作为数据传输格式要困难得多。
 ---
 
 ## 背景
 使用Protobuf会在整个API生命周期中面临许多挑战：
-
-* **API 设计不一致：** 编写可维护的、一致的 Protobuf API 不像编写可维护的基于 REST/JSON 的 API 那样被广泛理解。如果不执行标准，组织的 Protobuf API 可能会出现不一致，并且设计决策可能会无意中影响 API 未来的可迭代性。
+* **API 设计问题：** 编写 Protobuf API 不像编写可维护的基于 REST/JSON 的 API 那样易于理解，如果没有标准， Protobuf API 设计可能出现不一致并影响未来的迭代。
 * **缺乏依赖管理：** Protobuf 文件是从 GitHub 复制的可能包含错误内容的文件。在Buf Schema Registry (BSR)之前，没有尝试过统一的跟踪和管理跨文件依赖关系。这就像在没有 npm 的情况下编写 JavaScript，在没有cargo的情况下编写 Rust，在没有modules的情况下编写 Go，以及我们都已经习惯的所有其他编程语言依赖管理器。
-* **兼容性问题：** 虽然向前和向后兼容是 Protobuf 的承诺，但实际上维护向后兼容的 Protobuf API 并没有得到广泛的实践，而且很难实施。
-* **存根分发困难：** 组织必须选择集中他们的 protoc 工作流并分发生成的代码，或者要求所有服务客户端独立运行 protoc。因为以可靠的方式使用 protoc（和相关的 protoc 插件）有一定的学习成本，所以组织经常难以分发他们的 Protobuf 文件和存根。这样会产生大量开销，并且通常需要专门的团队来管理流程。即使使用像 Bazel 这样的构建系统，将 API 暴露给外部客户仍然存在问题。
-* **生态工具不完善：** 现在已有许多用于 REST/JSON API 的用户体验友好的工具，但是对于 Protobuf API 来说并没有被广泛标准化或用户友好的模拟服务器生成、模糊测试、文档的工具。因此，团队需要定期造轮子并构建自定义工具来复制 JSON 生态。
+* **兼容性问题：** 虽然 Protobuf 承诺向前和向后兼容，但实际上维护向后兼容的 Protobuf API 并没有得到广泛的实践，而且很难实施。
+* **生态工具不完善：** 现在已有很多用户体验良好的用于 REST/JSON API 的工具，但是 Protobuf API 缺少这些工具。因此，团队需要定期造轮子并构建自定义工具来复制 JSON 生态。
 
 ## Buf 优势
+Buf有两大利器：Buf CLI和Buf Schema Registry (BSR)。Buf CLI是一个开源的高性能Protobuf编译器、代码生成器和变更检测器；BSR是一个提供一站式服务的SAAS平台，有免费和收费版本，BSR 使您能够集中维护兼容性和管理依赖性，同时使您的客户能够可靠、高效地使用 API。
+
 Buf 解决了上述许多问题，Buf 可帮助您的团队在整个生命周期中使用 Protobuf API，无论您是为关键客户构建新 API 还是依赖另一个团队公开的 API，最终允许您将大部分时间和精力从管理 Protobuf 文件转移到实现核心功能和基础设施上来。
 
 **For Producers**
-* 一致地生成 Protocol Buffers API，利用 Buf 的直观工具集快速迭代并实施最佳实践。
-* 可靠地向用户分发 API，使他们能够针对您的最新版本进行开发，而无需昂贵的团队间沟通。
-* 通过可浏览的中央注册表、可显示的内容和生成的文档提高可发现性。
+
+● 一致地生成 Protocol Buffers API，利用 Buf 的直观工具集快速迭代并实施最佳实践。
+● 可靠地向用户分发 API，使他们能够针对您的最新版本进行开发，无需昂贵的沟通成本。
+● 通过可浏览的中央注册表、可显示的内容和生成的文档提高可发现性。
 
 **For Consumers**
-* 根据清晰的后端定义进行开发，使团队能够在通用模式上并行工作。
-* 使用 Buf 的直观工具消除摩擦，替换自定义、复杂的构建脚本。
-* 解锁生成的 CLI、运行时验证、自定义插件、模拟服务器、压力测试等功能。
 
-如果看到这里还是不太清楚使用Buf的好处在哪，没关系，下面我们将在实际使用中介绍。
+● 根据清晰的后端定义进行开发，使团队能够在通用模式上并行工作。
+● 使用 Buf 的直观工具消除摩擦，替换自定义、复杂的构建脚本。
+● 解锁生成的 CLI、运行时验证、自定义插件、模拟服务器、压力测试等功能。
 
 
-## 快速开始
-### 安装buf CLI
-macOS or Linux用户可以使用 [Brew](https://brew.sh/) 安装
-```
-$ brew install bufbuild/buf/buf
-```
-
-Windows用户可以使用 [Scoop](https://scoop.sh/) 安装，或者从 [Github](https://github.com/bufbuild/buf/releases/latest) 下载exe
-```
-scoop install buf
-```
-更多方式请参考[官网](https://docs.buf.build/installation)
-
-### 下载Demo
-需要先安装 [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-```
-$ git clone https://github.com/bufbuild/buf-tour
-```
-Demo中包含一个start和finish目录，start是初始状态，finish是通过buf命令行操作后的终态，结构如下：
-```
-buf-tour/
-├── finish
-│   ├── buf.gen.yaml
-│   ├── buf.work.yaml
-│   ├── client
-│   │   └── main.go
-│   ├── gen
-│   │   └── proto
-│   │       └── go
-│   │           ├── payment
-│   │           │   └── v1alpha1
-│   │           │       └── payment.pb.go
-│   │           └── pet
-│   │               └── v1
-│   │                   ├── pet.pb.go
-│   │                   └── pet_grpc.pb.go
-│   ├── go.mod
-│   ├── go.sum
-│   ├── paymentapis
-│   │   ├── buf.lock
-│   │   ├── buf.yaml
-│   │   └── payment
-│   │       └── v1alpha1
-│   │           └── payment.proto
-│   ├── petapis
-│   │   ├── buf.lock
-│   │   ├── buf.md
-│   │   ├── buf.yaml
-│   │   └── pet
-│   │       └── v1
-│   │           └── pet.proto
-│   └── server
-│       └── main.go
-└── start
-    └── petapis
-        ├── google
-        │   └── type
-        │       └── datetime.proto
-        └── pet
-            └── v1
-                └── pet.proto
-```

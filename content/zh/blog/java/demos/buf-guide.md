@@ -31,8 +31,7 @@ Buf 解决了上述许多问题，Buf 可帮助您的团队在整个生命周期
 * 解锁生成的 CLI、运行时验证、自定义插件、模拟服务器、压力测试等功能。
 
 ## 最佳实践
-### 风格指南
-#### 规范
+### 规范
 **Files and packages**
 * 所有文件都应该定义一个包
 * 同一个包的所有文件应该在同一个目录中，所有文件都应位于与其包名匹配的目录中。如下所示：
@@ -53,7 +52,7 @@ Buf 解决了上述许多问题，Buf 可帮助您的团队在整个生命周期
 * 包应遵循 lower_snake_case 风格
 * 包的最后一个层级应该以版本命名
 * 文件名应遵循 lower_snake_case.proto 风格
-* 同一包下的所有文件，所有文件选项都应具有相同的值，或者全部未设置
+* 同一包下的所有文件，所有文件选项都应具有相同的值，或者全部不设置
 
 **Imports**
 * 不要将Imports声明为public或weak类型的
@@ -112,8 +111,8 @@ message SampleMessage {
 * 服务名应遵循 PascalCase 风格
 * 服务名应以 Service 为后缀
 * RPC 名应遵循 PascalCase 风格
-* 所有 RPC 请求和响应消息在 Protobuf schema 中保持唯一
-* 所有 RPC 请求和响应消息都应以 RPC 命名，可以将它们命名为 MethodNameRequest、MethodNameResponse 或 ServiceNameMethodNameRequest、ServiceNameMethodNameResponse
+* 所有 RPC 请求和响应 message 在 Protobuf schema 中保持唯一
+* 所有 RPC 请求和响应 message 都应以 RPC 命名，可以将它们命名为 MethodNameRequest、MethodNameResponse 或 ServiceNameMethodNameRequest、ServiceNameMethodNameResponse
 
 ```
 service PetStoreService {
@@ -126,7 +125,7 @@ service PetStoreService {
 
 buf 提供了很多可配置在 buf.yaml 的 lint rules，使用 buf lint 命令可以列出不符合以上规范的文件，更多详情请参考 [Rules](https://docs.buf.build/lint/rules)
 
-#### 建议
+### 建议
 * 为你的 Protobuf schema 设置变更检测，如何设置可参考 [breaking change detector documentation](https://docs.buf.build/breaking/overview)
 * 使用 // 而不是 /\* \*/ 进行注释
 * 注释尽量完整，不要使用行内注释，而是注释在上面

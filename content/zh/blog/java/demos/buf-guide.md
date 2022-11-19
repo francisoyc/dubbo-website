@@ -32,7 +32,7 @@ Buf 解决了上述许多问题，Buf 可帮助您的团队在整个生命周期
 
 ## 最佳实践
 ### 风格指南
-#### 要求
+#### 规范
 **Files and packages**
 * 所有文件都应该定义一个包
 * 同一个包的所有文件应该在同一个目录中，所有文件都应位于与其包名匹配的目录中。如下所示：
@@ -50,9 +50,33 @@ Buf 解决了上述许多问题，Buf 可帮助您的团队在整个生命周期
                     ├── baz.proto         // package foo.bar.baz.v1
                     └── baz_service.proto // package foo.bar.baz.v1
 ```
-* 包应该遵循 lower_snake_case 风格
+* 包应遵循 lower_snake_case 风格
 * 包的最后一个层级应该以版本命名
-* 文件名应该遵循 lower_snake_case.proto 风格
+* 文件名应遵循 lower_snake_case.proto 风格
 * 同一包下的所有文件，所有文件选项都应具有相同的值，或者全部未设置
 
 **Imports**
+* 不要将Imports声明为public或weak类型的
+
+**Enums**
+* 枚举不应设置 allow_alias 选项
+* 枚举名称应遵循 PascalCase 风格
+* 枚举值名称遵循 UPPER_SNAKE_CASE 风格
+* 枚举值名称应以枚举名称的 UPPER_SNAKE_CASE 为前缀，示例：枚举名叫FooBar，枚举值应该以FOO_BAR_开头
+* 所有枚举的零值应以 \_UNSPECIFIED 为后缀，示例：枚举名叫FooBar，0值应该定义为FOO_BAR_UNSPECIFIED = 0;
+
+**Messages**
+* 消息名应遵循 PascalCase 风格
+* 字段名应遵循 lower_snake_case 风格
+* 至少有一个命名遵循 lower_snake_case 风格
+
+**Services**
+* 服务名应遵循 PascalCase 风格
+* 服务名应以 Service 为后缀
+* RPC 名应遵循 PascalCase 风格
+* 所有 RPC 请求和响应消息在 Protobuf Schema 中保持唯一
+* 所有 RPC 请求和响应消息都应以 RPC 命名，可以将它们命名为 MethodNameRequest、MethodNameResponse 或 ServiceNameMethodNameRequest、ServiceNameMethodNameResponse
+
+buf 提供了很多可配置在 buf.yaml 的 lint rules，使用 buf lint 命令可以列出不符合以上规范的文件，更多详情请参考 [Rules](https://docs.buf.build/lint/rules)
+
+#### 建议

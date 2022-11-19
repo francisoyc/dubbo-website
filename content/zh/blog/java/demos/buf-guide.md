@@ -65,18 +65,98 @@ Buf 解决了上述许多问题，Buf 可帮助您的团队在整个生命周期
 * 枚举值名称应以枚举名称的 UPPER_SNAKE_CASE 为前缀，示例：枚举名叫FooBar，枚举值应该以FOO_BAR_开头
 * 所有枚举的零值应以 \_UNSPECIFIED 为后缀，示例：枚举名叫FooBar，0值应该定义为FOO_BAR_UNSPECIFIED = 0;
 
+示例：
+```
+// PetType represents the different types of pets in the pet store.
+enum PetType {
+  PET_TYPE_UNSPECIFIED = 0;
+  PET_TYPE_CAT = 1;
+  PET_TYPE_DOG = 2;
+  PET_TYPE_SNAKE = 3;
+  PET_TYPE_HAMSTER = 4;
+}
+```
+
 **Messages**
-* 消息名应遵循 PascalCase 风格
+* message 名应遵循 PascalCase 风格
 * 字段名应遵循 lower_snake_case 风格
-* 至少有一个命名遵循 lower_snake_case 风格
+* oneof 命名应遵循 lower_snake_case 风格，更多 oneof 信息请参考 [oneof](https://developers.google.com/protocol-buffers/docs/proto3#oneof)
+
+示例：
+```
+// Pet represents a pet in the pet store.
+message Pet {
+  PetType pet_type = 1;
+  string pet_id = 2;
+  string name = 3;
+  google.type.DateTime created_at = 4;
+}
+
+message GetPetRequest {
+  string pet_id = 1;
+}
+
+message GetPetResponse {
+  Pet pet = 1;
+}
+
+message SampleMessage {
+  oneof test_oneof {
+    string name = 4;
+    SubMessage sub_message = 9;
+  }
+}
+```
 
 **Services**
 * 服务名应遵循 PascalCase 风格
 * 服务名应以 Service 为后缀
 * RPC 名应遵循 PascalCase 风格
-* 所有 RPC 请求和响应消息在 Protobuf Schema 中保持唯一
+* 所有 RPC 请求和响应消息在 Protobuf schema 中保持唯一
 * 所有 RPC 请求和响应消息都应以 RPC 命名，可以将它们命名为 MethodNameRequest、MethodNameResponse 或 ServiceNameMethodNameRequest、ServiceNameMethodNameResponse
+
+```
+service PetStoreService {
+  rpc GetPet(GetPetRequest) returns (GetPetResponse) {}
+  rpc PutPet(PutPetRequest) returns (PutPetResponse) {}
+  rpc DeletePet(DeletePetRequest) returns (DeletePetResponse) {}
+  rpc PurchasePet(PurchasePetRequest) returns (PurchasePetResponse) {}
+}
+```
 
 buf 提供了很多可配置在 buf.yaml 的 lint rules，使用 buf lint 命令可以列出不符合以上规范的文件，更多详情请参考 [Rules](https://docs.buf.build/lint/rules)
 
 #### 建议
+* 为你的 Protobuf schema 设置变更检测，如何设置可参考 [breaking change detector documentation](https://docs.buf.build/breaking/overview)
+* 使用 // 而不是 /\* \*/ 进行注释
+* 注释尽量完整，不要使用行内注释，而是注释在上面
+* 避免对所有类型广泛使用的关键字，尤其是包。例如，如果包名是 foo.internal.bar，那么 internal 组件会阻止在 Golang 的其他包中导入生成的存根
+* 文件内容按照下面顺序排列：
+     * License header (if applicable)
+     * File overview
+     * Syntax
+     * Package
+     * Imports (sorted)
+     * File options
+     * Everything else
+ ```
+ syntax = "proto3";
+
+package pet.v1;
+
+import "google/type/datetime.proto";
+import "payment/v1alpha1/payment.proto";
+
+// PetType represents the different types of pets in the pet store.
+enum PetType {
+  PET_TYPE_UNSPECIFIED = 0;
+  PET_TYPE_CAT = 1;
+  PET_TYPE_DOG = 2;
+  PET_TYPE_SNAKE = 3;
+  PET_TYPE_HAMSTER = 4;
+}
+ ```
+ 
+ * 对重复字段使用复数名称
+ * 尽可能以类型命名字段，例如：对于 FooBar 类型字段，没有特殊情况应将字段命名为 foo_bar 
+ * 避免使用嵌套 enum 和嵌套 message

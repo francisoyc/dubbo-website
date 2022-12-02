@@ -8,10 +8,9 @@ description: >-
 
 ## 现状
 使用 Protobuf 会在整个 API 生命周期中面临许多挑战：
-* API 设计不一致： Protobuf API 不像 REST/JSON 的 API 那么好理解，如果没有标准或规范， Protobuf API 设计可能出现不一致并影响未来的迭代。
-* 缺少依赖管理思想： Protobuf 文件可能是从 GitHub 仓库复制粘贴的，这个过程很容易出错。在 Buf Schema Registry (BSR) 之前，没有尝试过统一的跟踪和管理跨文件依赖关系。这就像在没有 npm 的情况下编写 JavaScript，在没有 cargo 的情况下编写 Rust 等等。
-* 兼容性问题： 虽然 Protobuf 号称可以向前和向后兼容，但实际上维护向后兼容的 Protobuf API 并没有得到广泛的实践，而且很难实施。
-* 代码生成&分发困难：使用 protoc 和相关插件生成代码学习成本高，通常需要专门的团队负责这个事。
+* API 设计和兼容性： Protobuf API 不像 REST/JSON 的 API 那么好理解，如果没有标准或规范， Protobuf API 设计可能出现不一致并影响未来的迭代。
+* 缺乏依赖管理： Protobuf 文件可以导入需要在编译时提供给编译器的依赖项。开发人员需要自己弄清楚如何找到现有的 Protobuf 定义、管理依赖项并确保它们是最新的。
+* 代码生成&分发困难：使用 protoc 和相关插件生成代码学习成本高，同时开发人员需要用相同的配置确保环境配置正确，通常需要专门的团队负责这个事。
 * 生态工具不完善：REST/JSON API 有很多用户体验不错的工具，但是 Protobuf API 比较缺少。因此，团队需要定期造轮子并构建自定义工具来复制 JSON 生态。
 
 ## Buf 介绍
